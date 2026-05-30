@@ -16,6 +16,11 @@
   "prefer_related_applications": false,
   "related_applications": [],
   "iarc_rating_id": "",
+  "serviceworker": {
+    "src": "/sw.js",
+    "scope": "/",
+    "use_cache": true
+  },
   "icons": [
     {
       "src": "/dp/icon-192x192.png",
