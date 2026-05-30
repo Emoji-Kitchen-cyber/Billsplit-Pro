@@ -1,49 +1,1734 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0f0f14">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="Split bills fairly with friends. Zero drama, instant settlements.">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f0f14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BillSplit Pro">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Split bills fairly with friends. Zero drama, instant settlements.">
+<title>BillSplit Pro — Fair Split, Zero Drama</title>
 
-  <title>BillSplit Pro — Fair Split, Zero Drama</title>
+<!-- PWA MANIFEST INLINE -->
+<script>
+const manifestData = {
+  name: "BillSplit Pro",
+  short_name: "BillSplit",
+  description: "Split bills fairly with friends",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#0f0f14",
+  theme_color: "#0f0f14",
+  orientation: "portrait",
+  icons: [
+    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%230f0f14'/%3E%3Ctext x='96' y='130' text-anchor='middle' font-size='100'%3E💰%3C/text%3E%3C/svg%3E", sizes: "192x192", type: "image/svg+xml" },
+    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%230f0f14'/%3E%3Ctext x='256' y='340' text-anchor='middle' font-size='280'%3E💰%3C/text%3E%3C/svg%3E", sizes: "512x512", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifestData)], {type:'application/json'});
+const manifestURL = URL.createObjectURL(blob);
+document.write('<link rel="manifest" href="' + manifestURL + '">');
+</script>
 
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anybody:wght@400;600;700;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@400;600;700;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════ */
+:root {
+  --bg:      #0f0f14;
+  --surface: #17171f;
+  --card:    #1e1e28;
+  --card2:   #252532;
+  --border:  rgba(255,255,255,0.07);
+  --text:    #f0f0f8;
+  --sub:     #7f7f9a;
+  --lime:    #c8f135;
+  --lime2:   #a8d420;
+  --blue:    #4f8aff;
+  --red:     #ff5f5f;
+  --amber:   #ffb444;
+  --green:   #3dd68c;
+  --purple:  #a78bfa;
+  --pink:    #f472b6;
+  --r:       16px;
+  --r2:      12px;
+  --font:    'Anybody', sans-serif;
+  --body:    'DM Sans', sans-serif;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+::-webkit-scrollbar { width:0; height:0; }
+
+body {
+  font-family: var(--body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  padding-bottom: calc(80px + var(--safe-bot));
+  padding-top: var(--safe-top);
+}
+
+body::before {
+  content:'';
+  position:fixed; top:-150px; left:-150px;
+  width:500px; height:500px;
+  background:radial-gradient(circle, rgba(200,241,53,0.05) 0%, transparent 70%);
+  pointer-events:none; z-index:0;
+}
+
+/* ═══════════════════════════════════════
+   INSTALL BANNER
+═══════════════════════════════════════ */
+.install-banner {
+  display:none;
+  background: linear-gradient(135deg, rgba(200,241,53,0.15), rgba(79,138,255,0.1));
+  border: 1px solid rgba(200,241,53,0.3);
+  border-radius: var(--r2);
+  padding: 12px 16px;
+  margin: 12px 16px 0;
+  gap: 12px;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+.install-banner.show { display:flex; }
+.ib-text { flex:1; font-size:13px; line-height:1.4; }
+.ib-text b { color:var(--lime); }
+.ib-btn {
+  background: var(--lime);
+  border:none; border-radius:8px;
+  padding:8px 14px;
+  color:#0f0f14;
+  font-weight:700; font-size:12px;
+  cursor:pointer; white-space:nowrap;
+}
+.ib-close {
+  background:none; border:none;
+  color:var(--sub); font-size:18px;
+  cursor:pointer; padding:0 4px;
+}
+
+/* ═══════════════════════════════════════
+   HEADER
+═══════════════════════════════════════ */
+.header {
+  position:sticky; top:0; z-index:100;
+  background:rgba(15,15,20,0.95);
+  backdrop-filter:blur(20px);
+  padding:14px 20px 12px;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.logo { font-family:var(--font); font-weight:900; font-size:20px; letter-spacing:-0.5px; }
+.logo span { color:var(--lime); }
+.header-right { display:flex; gap:8px; align-items:center; }
+.icon-btn {
+  width:36px; height:36px; border-radius:50%;
+  background:var(--card); border:1px solid var(--border);
+  color:var(--sub); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:15px; transition:all 0.2s;
+}
+.icon-btn:hover { border-color:var(--lime); color:var(--lime); }
+.notif-dot {
+  position:relative;
+}
+.notif-dot::after {
+  content:''; position:absolute; top:6px; right:6px;
+  width:7px; height:7px; border-radius:50%;
+  background:var(--red); border:2px solid var(--bg);
+  display:none;
+}
+.notif-dot.has-notif::after { display:block; }
+
+/* ═══════════════════════════════════════
+   PAGES
+═══════════════════════════════════════ */
+.page { display:none; padding:16px 16px 20px; animation:fadeIn 0.2s ease; }
+.page.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+
+.page-title { font-family:var(--font); font-weight:900; font-size:26px; letter-spacing:-0.5px; margin-bottom:2px; }
+.page-sub   { font-size:13px; color:var(--sub); margin-bottom:16px; }
+
+/* ═══════════════════════════════════════
+   SUMMARY CARD
+═══════════════════════════════════════ */
+.summary-card {
+  background:linear-gradient(135deg, var(--lime), #8adb00);
+  border-radius:20px; padding:20px 22px;
+  margin-bottom:16px; position:relative; overflow:hidden;
+}
+.summary-card::before {
+  content:'💰';
+  position:absolute; right:-10px; top:-10px;
+  font-size:80px; opacity:0.12;
+}
+.sc-row { display:flex; gap:20px; }
+.sc-box { flex:1; }
+.sc-label { font-size:11px; font-weight:700; color:rgba(0,0,0,0.5); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+.sc-amount { font-family:var(--font); font-size:26px; font-weight:900; color:#0f0f14; letter-spacing:-1px; }
+.sc-sub { font-size:12px; color:rgba(0,0,0,0.5); margin-top:2px; }
+
+/* QUICK STATS ROW */
+.quick-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+.qs-box {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:var(--r2); padding:12px 10px; text-align:center;
+}
+.qs-num { font-family:var(--font); font-size:20px; font-weight:900; color:var(--lime); }
+.qs-lbl { font-size:10px; color:var(--sub); margin-top:2px; text-transform:uppercase; letter-spacing:0.5px; }
+
+/* ═══════════════════════════════════════
+   SECTION HEAD
+═══════════════════════════════════════ */
+.section-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.section-label { font-size:11px; font-weight:700; color:var(--sub); text-transform:uppercase; letter-spacing:1px; }
+.see-all { font-size:12px; color:var(--lime); font-weight:600; cursor:pointer; }
+
+/* ═══════════════════════════════════════
+   GROUP CARDS
+═══════════════════════════════════════ */
+.group-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:var(--r); padding:14px 16px;
+  margin-bottom:8px; cursor:pointer;
+  transition:all 0.2s; display:flex; align-items:center; gap:12px;
+  position:relative; overflow:hidden;
+}
+.group-card::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg, transparent, rgba(200,241,53,0.03));
+  opacity:0; transition:opacity 0.2s;
+}
+.group-card:hover { border-color:rgba(200,241,53,0.3); transform:translateY(-1px); }
+.group-card:hover::after { opacity:1; }
+.group-card:active { transform:scale(0.99); }
+
+.gc-emoji {
+  width:44px; height:44px; border-radius:12px;
+  background:var(--card2); display:flex; align-items:center; justify-content:center;
+  font-size:20px; flex-shrink:0;
+}
+.gc-info { flex:1; min-width:0; }
+.gc-name { font-weight:700; font-size:14px; margin-bottom:3px; }
+.gc-meta { font-size:11px; color:var(--sub); }
+.gc-right { text-align:right; flex-shrink:0; }
+.gc-amount { font-family:var(--font); font-weight:700; font-size:15px; }
+.gc-amount.owe  { color:var(--red); }
+.gc-amount.owed { color:var(--green); }
+.gc-amount.zero { color:var(--sub); }
+.gc-label { font-size:10px; color:var(--sub); margin-top:2px; }
+
+/* ═══════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════ */
+.empty-state {
+  text-align:center; padding:40px 20px; color:var(--sub);
+}
+.es-icon { font-size:3rem; margin-bottom:12px; opacity:0.35; display:block; }
+.es-title { font-weight:700; font-size:15px; color:var(--text); margin-bottom:6px; }
+.es-sub { font-size:13px; line-height:1.6; }
+
+/* ═══════════════════════════════════════
+   FAB
+═══════════════════════════════════════ */
+.fab {
+  position:fixed; bottom:calc(88px + var(--safe-bot)); right:16px;
+  width:54px; height:54px; border-radius:16px;
+  background:var(--lime); border:none; color:#0f0f14;
+  font-size:24px; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; box-shadow:0 4px 20px rgba(200,241,53,0.35);
+  transition:all 0.2s; z-index:90;
+}
+.fab:hover { transform:scale(1.07); }
+.fab:active { transform:scale(0.97); }
+
+/* ═══════════════════════════════════════
+   BOTTOM NAV
+═══════════════════════════════════════ */
+.bottom-nav {
+  position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+  width:100%; max-width:430px;
+  background:rgba(15,15,20,0.97);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex; padding:10px 0 calc(14px + var(--safe-bot));
+  z-index:100;
+}
+.nav-item {
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+  cursor:pointer; transition:all 0.2s; padding:4px 0; position:relative;
+}
+.nav-item .ni-icon { font-size:19px; opacity:0.35; transition:all 0.2s; }
+.nav-item .ni-lbl  { font-size:10px; font-weight:600; color:var(--sub); transition:all 0.2s; letter-spacing:0.3px; }
+.nav-item.active .ni-icon { opacity:1; }
+.nav-item.active .ni-lbl  { color:var(--lime); }
+.nav-badge {
+  position:absolute; top:2px; right:calc(50% - 18px);
+  background:var(--red); color:#fff;
+  font-size:9px; font-weight:700;
+  min-width:16px; height:16px; border-radius:99px;
+  display:flex; align-items:center; justify-content:center; padding:0 3px;
+  display:none;
+}
+.nav-badge.show { display:flex; }
+
+/* ═══════════════════════════════════════
+   GROUP DETAIL
+═══════════════════════════════════════ */
+.back-btn {
+  display:flex; align-items:center; gap:6px;
+  color:var(--sub); font-size:13px; font-weight:600;
+  cursor:pointer; margin-bottom:16px;
+  background:none; border:none; padding:0;
+}
+.back-btn:hover { color:var(--text); }
+
+.group-hero {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:20px; padding:20px; margin-bottom:12px;
+  display:flex; align-items:center; gap:16px;
+}
+.gh-emoji { font-size:2.8rem; }
+.gh-info { flex:1; }
+.gh-name { font-family:var(--font); font-size:20px; font-weight:900; margin-bottom:3px; }
+.gh-meta { font-size:12px; color:var(--sub); }
+.gh-actions { display:flex; gap:6px; }
+.gh-btn {
+  width:34px; height:34px; border-radius:10px;
+  background:var(--card2); border:1px solid var(--border);
+  color:var(--sub); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:15px; transition:all 0.15s;
+}
+.gh-btn:hover { border-color:var(--lime); color:var(--lime); }
+
+/* BALANCE CHIPS */
+.balance-row { display:flex; gap:7px; overflow-x:auto; margin-bottom:12px; padding-bottom:2px; }
+.balance-chip {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:10px; padding:10px 12px; flex-shrink:0; min-width:85px;
+}
+.bc-avatar {
+  width:24px; height:24px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; margin-bottom:5px;
+}
+.bc-name  { font-size:11px; color:var(--sub); margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:75px; }
+.bc-amt   { font-family:var(--font); font-weight:700; font-size:14px; }
+.bc-amt.pos { color:var(--green); }
+.bc-amt.neg { color:var(--red); }
+.bc-amt.zero{ color:var(--sub); }
+
+/* SETTLE CARD */
+.settle-card {
+  background:linear-gradient(135deg, rgba(61,214,140,0.08), rgba(79,138,255,0.05));
+  border:1px solid rgba(61,214,140,0.2);
+  border-radius:var(--r); padding:14px 16px; margin-bottom:12px;
+}
+.settle-title { font-size:11px; font-weight:700; color:var(--green); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+.settle-row {
+  display:flex; align-items:center; gap:8px;
+  padding:7px 0; border-bottom:1px solid var(--border); font-size:13px;
+}
+.settle-row:last-child { border-bottom:none; }
+.settle-from { font-weight:600; flex:1; }
+.settle-arrow { color:var(--sub); font-size:12px; }
+.settle-to   { font-weight:600; flex:1; text-align:right; }
+.settle-amt  { font-family:var(--font); font-weight:700; color:var(--amber); min-width:72px; text-align:center; font-size:13px; }
+.settle-paid-btn {
+  background:rgba(61,214,140,0.15); border:1px solid rgba(61,214,140,0.3);
+  border-radius:6px; padding:3px 8px; font-size:10px; font-weight:700; color:var(--green);
+  cursor:pointer; transition:all 0.15s; white-space:nowrap;
+}
+.settle-paid-btn:hover { background:rgba(61,214,140,0.25); }
+
+/* EXPENSE ITEM */
+.expense-item {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:var(--r2); padding:12px 14px;
+  margin-bottom:7px; display:flex; align-items:center; gap:11px;
+  cursor:pointer; transition:all 0.15s; position:relative;
+}
+.expense-item:hover { border-color:rgba(255,255,255,0.12); }
+.expense-item:active { transform:scale(0.99); }
+.ei-icon {
+  width:38px; height:38px; border-radius:10px;
+  background:var(--card2); display:flex; align-items:center; justify-content:center;
+  font-size:17px; flex-shrink:0;
+}
+.ei-info { flex:1; min-width:0; }
+.ei-name { font-weight:600; font-size:13px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ei-by   { font-size:11px; color:var(--sub); }
+.ei-right { text-align:right; flex-shrink:0; }
+.ei-amount { font-family:var(--font); font-weight:700; font-size:14px; }
+.ei-share  { font-size:10px; color:var(--sub); margin-top:2px; }
+
+/* ═══════════════════════════════════════
+   MODALS
+═══════════════════════════════════════ */
+.modal-overlay {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(6px);
+  z-index:200; display:none;
+  align-items:flex-end; justify-content:center;
+}
+.modal-overlay.open { display:flex; }
+
+.modal-sheet {
+  background:var(--surface);
+  border-radius:24px 24px 0 0;
+  padding:20px 18px calc(28px + var(--safe-bot));
+  width:100%; max-width:430px;
+  border-top:1px solid var(--border);
+  animation:slideUp 0.32s cubic-bezier(0.16,1,0.3,1);
+  max-height:92vh; overflow-y:auto;
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+
+.sheet-handle { width:36px; height:4px; background:var(--card2); border-radius:99px; margin:0 auto 18px; }
+.sheet-title  { font-family:var(--font); font-size:20px; font-weight:900; margin-bottom:18px; letter-spacing:-0.3px; }
+
+/* ═══════════════════════════════════════
+   FORM ELEMENTS
+═══════════════════════════════════════ */
+.form-group { margin-bottom:14px; }
+.f-label { font-size:11px; font-weight:700; color:var(--sub); text-transform:uppercase; letter-spacing:0.8px; display:block; margin-bottom:7px; }
+
+.f-input {
+  width:100%; background:var(--card); border:1.5px solid var(--border);
+  border-radius:12px; color:var(--text); padding:12px 14px;
+  font-family:var(--body); font-size:15px; outline:none; transition:border-color 0.2s;
+}
+.f-input:focus { border-color:var(--lime); }
+.f-input::placeholder { color:var(--sub); }
+
+.f-amount {
+  font-family:var(--font); font-size:32px; font-weight:700;
+  text-align:center; padding:14px; letter-spacing:-1px;
+}
+
+.f-row2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+/* EMOJI PICKER */
+.emoji-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:5px; }
+.ep-btn {
+  aspect-ratio:1; background:var(--card); border:2px solid transparent;
+  border-radius:10px; font-size:19px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:all 0.12s;
+}
+.ep-btn:hover   { background:var(--card2); }
+.ep-btn.sel     { border-color:var(--lime); background:rgba(200,241,53,0.08); }
+
+/* SPLIT TABS */
+.split-tabs { display:flex; background:var(--card); border-radius:10px; padding:3px; gap:3px; margin-bottom:12px; }
+.st-tab { flex:1; padding:8px; border-radius:7px; border:none; background:transparent; color:var(--sub); font-size:12px; font-weight:600; cursor:pointer; transition:all 0.18s; }
+.st-tab.active { background:var(--lime); color:#0f0f14; }
+
+/* MEMBER CHIPS */
+.member-chips { display:flex; flex-wrap:wrap; gap:7px; }
+.mc {
+  display:flex; align-items:center; gap:6px;
+  background:var(--card); border:1.5px solid var(--border);
+  border-radius:99px; padding:6px 12px;
+  font-size:13px; cursor:pointer; transition:all 0.14s;
+}
+.mc.sel { background:rgba(200,241,53,0.1); border-color:var(--lime); color:var(--lime); }
+.mc-av  { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; }
+
+/* PAYER SELECT */
+.payer-list { display:flex; flex-wrap:wrap; gap:6px; }
+.payer-btn {
+  padding:7px 14px; border-radius:99px;
+  border:1.5px solid var(--border); background:var(--card);
+  color:var(--sub); font-size:13px; font-weight:600;
+  cursor:pointer; transition:all 0.14s;
+}
+.payer-btn.active { border-color:var(--blue); color:var(--blue); background:rgba(79,138,255,0.1); }
+
+/* BUTTONS */
+.btn-primary {
+  width:100%; padding:15px; background:var(--lime); border:none;
+  border-radius:14px; color:#0f0f14; font-family:var(--font);
+  font-size:16px; font-weight:900; cursor:pointer; transition:all 0.2s;
+  margin-top:6px; letter-spacing:-0.3px;
+}
+.btn-primary:hover  { background:var(--lime2); transform:translateY(-1px); }
+.btn-primary:active { transform:translateY(0) scale(0.99); }
+
+.btn-ghost {
+  width:100%; padding:13px; background:transparent;
+  border:1.5px solid var(--border); border-radius:14px;
+  color:var(--sub); font-family:var(--body);
+  font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; margin-top:7px;
+}
+.btn-ghost:hover { border-color:var(--sub); color:var(--text); }
+
+.btn-danger {
+  width:100%; padding:13px; background:rgba(255,95,95,0.1);
+  border:1.5px solid rgba(255,95,95,0.3); border-radius:14px;
+  color:var(--red); font-family:var(--body);
+  font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; margin-top:7px;
+}
+.btn-danger:hover { background:rgba(255,95,95,0.18); }
+
+/* SHARE BTN */
+.btn-whatsapp {
+  width:100%; padding:14px;
+  background:linear-gradient(135deg,#25D366,#128C7E);
+  border:none; border-radius:14px; color:#fff;
+  font-family:var(--font); font-size:15px; font-weight:700;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:all 0.2s; margin-top:8px;
+}
+.btn-whatsapp:hover { opacity:0.9; transform:translateY(-1px); }
+
+/* ═══════════════════════════════════════
+   RECEIPT / PHOTO
+═══════════════════════════════════════ */
+.receipt-zone {
+  border:2px dashed var(--border); border-radius:12px;
+  padding:16px; text-align:center; cursor:pointer;
+  transition:all 0.2s; position:relative; background:var(--card);
+}
+.receipt-zone:hover { border-color:var(--blue); }
+.receipt-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+.receipt-preview { width:100%; border-radius:8px; margin-top:8px; max-height:150px; object-fit:cover; display:none; }
+
+/* ═══════════════════════════════════════
+   ACTIVITY
+═══════════════════════════════════════ */
+.activity-item {
+  display:flex; gap:12px; padding:12px 0;
+  border-bottom:1px solid var(--border); align-items:flex-start;
+}
+.ai-icon { width:36px; height:36px; border-radius:10px; background:var(--card); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.ai-body { flex:1; }
+.ai-text { font-size:13px; line-height:1.5; }
+.ai-text b { color:var(--lime); }
+.ai-meta { font-size:11px; color:var(--sub); margin-top:3px; }
+.ai-amount { font-family:var(--font); font-weight:700; font-size:13px; flex-shrink:0; color:var(--green); }
+
+/* ═══════════════════════════════════════
+   SETTINGS
+═══════════════════════════════════════ */
+.settings-item {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:var(--r2); padding:14px 16px;
+  display:flex; align-items:center; gap:14px;
+  margin-bottom:7px; cursor:pointer; transition:all 0.15s;
+}
+.settings-item:hover { border-color:rgba(255,255,255,0.12); }
+.si-icon { font-size:18px; width:34px; text-align:center; flex-shrink:0; }
+.si-body { flex:1; }
+.si-title { font-weight:600; font-size:14px; }
+.si-sub   { font-size:11px; color:var(--sub); margin-top:2px; }
+.si-right { color:var(--sub); font-size:14px; }
+
+/* CURRENCY */
+.curr-grid { display:flex; flex-wrap:wrap; gap:7px; }
+.curr-btn {
+  padding:7px 13px; border-radius:99px;
+  border:1.5px solid var(--border); background:var(--card);
+  color:var(--sub); font-size:13px; font-weight:600; cursor:pointer; transition:all 0.14s;
+}
+.curr-btn.active { border-color:var(--lime); color:var(--lime); background:rgba(200,241,53,0.08); }
+
+/* PROFILE AVATAR */
+.profile-avatar {
+  width:64px; height:64px; border-radius:20px;
+  background:linear-gradient(135deg,var(--lime),var(--blue));
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font); font-size:28px; font-weight:900; color:#0f0f14;
+  margin:0 auto 14px;
+}
+
+/* ═══════════════════════════════════════
+   EXPENSE DETAIL MODAL
+═══════════════════════════════════════ */
+.split-detail-row {
+  display:flex; align-items:center; gap:10px;
+  padding:8px 0; border-bottom:1px solid var(--border); font-size:13px;
+}
+.split-detail-row:last-child { border-bottom:none; }
+.sdr-av { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
+.sdr-name { flex:1; font-weight:500; }
+.sdr-amount { font-family:var(--font); font-weight:700; font-size:13px; }
+.sdr-status { font-size:10px; padding:2px 7px; border-radius:99px; font-weight:600; }
+.sdr-status.paid { background:rgba(61,214,140,0.15); color:var(--green); }
+.sdr-status.owes { background:rgba(255,95,95,0.12); color:var(--red); }
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+.toast {
+  position:fixed; bottom:calc(95px + var(--safe-bot)); left:50%;
+  transform:translateX(-50%) translateY(8px);
+  background:var(--card2); border:1px solid var(--lime);
+  color:var(--lime); padding:9px 18px;
+  border-radius:99px; font-size:13px; font-weight:600;
+  z-index:999; opacity:0; transition:all 0.25s;
+  white-space:nowrap; pointer-events:none;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.err  { border-color:var(--red); color:var(--red); }
+
+/* AD PLACEHOLDER */
+.ad-slot {
+  background:var(--card); border:1px dashed rgba(255,255,255,0.08);
+  border-radius:10px; padding:9px; text-align:center;
+  font-size:11px; color:var(--sub); margin-bottom:14px;
+  min-height:52px; display:flex; align-items:center; justify-content:center;
+}
+
+/* SEARCH BAR */
+.search-bar-wrap { position:relative; margin-bottom:14px; }
+.search-input {
+  width:100%; background:var(--card); border:1.5px solid var(--border);
+  border-radius:12px; color:var(--text); padding:11px 14px 11px 38px;
+  font-family:var(--body); font-size:14px; outline:none; transition:border-color 0.2s;
+}
+.search-input:focus { border-color:var(--lime); }
+.search-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--sub); font-size:15px; }
+</style>
 </head>
 <body>
 
-  <!-- INSTALL BANNER -->
-  <div class="install-banner" id="installBanner">
-    <div class="ib-text"><b>Install BillSplit Pro</b><br>Add to home screen for best experience</div>
-    <button class="ib-btn" onclick="installApp()">Install</button>
-    <button class="ib-close" onclick="dismissInstall()">×</button>
-  </div>
+<!-- INSTALL BANNER -->
+<div class="install-banner" id="installBanner">
+  <div class="ib-text"><b>Install BillSplit Pro</b><br>Add to home screen for best experience</div>
+  <button class="ib-btn" id="installBtn" onclick="installApp()">Install</button>
+  <button class="ib-close" onclick="dismissInstall()">×</button>
+</div>
 
-  <!-- HEADER -->
-  <div class="header">
-    <div class="logo">Bill<span>Split</span></div>
-    <div class="header-right">
-      <div class="icon-btn notif-dot" id="notifBtn" onclick="showModal('notif')">🔔</div>
-      <div class="icon-btn" onclick="navTo('settings')">⚙️</div>
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">Bill<span>Split</span></div>
+  <div class="header-right">
+    <div class="icon-btn notif-dot" id="notifBtn" onclick="showModal('notif')">🔔</div>
+    <div class="icon-btn" onclick="navTo('settings')">⚙️</div>
+  </div>
+</div>
+
+<!-- ══════════════ PAGES ══════════════ -->
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="page-title">My Groups</div>
+  <div class="page-sub">Track every shared expense</div>
+
+  <div class="summary-card">
+    <div class="sc-row">
+      <div class="sc-box">
+        <div class="sc-label">You Owe</div>
+        <div class="sc-amount" id="s-owe">Rs 0</div>
+        <div class="sc-sub">total outstanding</div>
+      </div>
+      <div class="sc-box">
+        <div class="sc-label">Owed to You</div>
+        <div class="sc-amount" id="s-owed">Rs 0</div>
+        <div class="sc-sub">across all groups</div>
+      </div>
     </div>
   </div>
 
-  <!-- Pages -->
-  <div class="page active" id="page-home"> ... (Full content same as your original) ... </div>
-  <div class="page" id="page-group"> ... </div>
-  <div class="page" id="page-activity"> ... </div>
-  <div class="page" id="page-friends"> ... </div>
-  <div class="page" id="page-settings"> ... </div>
+  <div class="quick-stats">
+    <div class="qs-box"><div class="qs-num" id="qs-groups">0</div><div class="qs-lbl">Groups</div></div>
+    <div class="qs-box"><div class="qs-num" id="qs-exp">0</div><div class="qs-lbl">Expenses</div></div>
+    <div class="qs-box"><div class="qs-num" id="qs-settled">0</div><div class="qs-lbl">Settled</div></div>
+  </div>
 
-  <!-- Bottom Nav + FAB + All Modals -->
-  <!-- Copy all remaining HTML from your original code (everything between <body> and </body> except <style> and <script>) -->
+  <div class="search-bar-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="searchGroups" placeholder="Search groups..." oninput="filterGroups(this.value)">
+  </div>
 
-  <script src="js/app.js" defer></script>
+  <!-- AdMob Banner Slot -->
+  <div class="ad-slot" id="adBanner">📢 Ad — AdMob Banner (320×50)</div>
+
+  <div class="section-head">
+    <span class="section-label">Groups</span>
+    <span class="see-all" onclick="showModal('newGroup')">+ New Group</span>
+  </div>
+
+  <div id="groupsList"></div>
+</div>
+
+<!-- GROUP DETAIL -->
+<div class="page" id="page-group">
+  <button class="back-btn" onclick="navTo('home')">← All Groups</button>
+
+  <div class="group-hero">
+    <div class="gh-emoji" id="gd-emoji">🍕</div>
+    <div class="gh-info">
+      <div class="gh-name" id="gd-name">Group</div>
+      <div class="gh-meta" id="gd-meta">0 members</div>
+    </div>
+    <div class="gh-actions">
+      <div class="gh-btn" onclick="showGroupSettings()" title="Settings">⚙️</div>
+      <div class="gh-btn" onclick="shareGroup()" title="Share">📤</div>
+    </div>
+  </div>
+
+  <div class="balance-row" id="balanceRow"></div>
+
+  <div id="settleCard" style="display:none"></div>
+
+  <div class="section-head">
+    <span class="section-label">Expenses</span>
+    <span class="see-all" onclick="showAddExpense()">+ Add</span>
+  </div>
+
+  <div id="expensesList"></div>
+
+  <button class="btn-whatsapp" onclick="shareGroup()">💬 Share via WhatsApp</button>
+</div>
+
+<!-- ACTIVITY -->
+<div class="page" id="page-activity">
+  <div class="page-title">Activity</div>
+  <div class="page-sub">All recent transactions</div>
+  <div id="activityList"></div>
+</div>
+
+<!-- FRIENDS -->
+<div class="page" id="page-friends">
+  <div class="page-title">Friends</div>
+  <div class="page-sub">People you split with</div>
+  <div id="friendsList"></div>
+</div>
+
+<!-- SETTINGS -->
+<div class="page" id="page-settings">
+  <div class="page-title">Settings</div>
+  <div class="page-sub">Your preferences</div>
+
+  <div class="profile-avatar" id="profileAvatar">Y</div>
+
+  <div class="form-group" style="margin-bottom:20px">
+    <label class="f-label">Your Name</label>
+    <input class="f-input" id="userName" placeholder="Enter your name" value="You" oninput="saveName(this.value)">
+  </div>
+
+  <div class="form-group" style="margin-bottom:20px">
+    <label class="f-label">Currency</label>
+    <div class="curr-grid" id="currencyGrid">
+      <button class="curr-btn active" data-c="Rs"  onclick="setCurrency(this)">🇵🇰 PKR</button>
+      <button class="curr-btn" data-c="₹"   onclick="setCurrency(this)">🇮🇳 INR</button>
+      <button class="curr-btn" data-c="$"   onclick="setCurrency(this)">🇺🇸 USD</button>
+      <button class="curr-btn" data-c="£"   onclick="setCurrency(this)">🇬🇧 GBP</button>
+      <button class="curr-btn" data-c="€"   onclick="setCurrency(this)">🇪🇺 EUR</button>
+      <button class="curr-btn" data-c="AED" onclick="setCurrency(this)">🇦🇪 AED</button>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-bottom:10px">Data & Privacy</div>
+  <div class="settings-item" onclick="exportData()">
+    <div class="si-icon">📤</div>
+    <div class="si-body"><div class="si-title">Export Data</div><div class="si-sub">Download backup as JSON</div></div>
+    <div class="si-right">›</div>
+  </div>
+  <div class="settings-item" onclick="importData()">
+    <div class="si-icon">📥</div>
+    <div class="si-body"><div class="si-title">Import Backup</div><div class="si-sub">Restore from JSON file</div></div>
+    <div class="si-right">›</div>
+  </div>
+  <div class="settings-item" onclick="clearData()">
+    <div class="si-icon">🗑️</div>
+    <div class="si-body"><div class="si-title">Clear All Data</div><div class="si-sub">Delete everything permanently</div></div>
+    <div class="si-right">›</div>
+  </div>
+
+  <div style="text-align:center;color:var(--sub);font-size:11px;padding:20px 0 4px;line-height:1.8">
+    BillSplit Pro v2.0<br>
+    All data stored on your device only<br>
+    <span style="color:var(--lime)">Made with ❤️ — Free Forever</span>
+  </div>
+</div>
+
+<!-- ══════════════ BOTTOM NAV ══════════════ -->
+<div class="bottom-nav">
+  <div class="nav-item active" id="nav-home" onclick="navTo('home')">
+    <div class="ni-icon">🏠</div><div class="ni-lbl">Home</div>
+  </div>
+  <div class="nav-item" id="nav-activity" onclick="navTo('activity')">
+    <div class="ni-icon">📋</div><div class="ni-lbl">Activity</div>
+    <div class="nav-badge" id="nb-activity"></div>
+  </div>
+  <div class="nav-item" id="nav-friends" onclick="navTo('friends')">
+    <div class="ni-icon">👥</div><div class="ni-lbl">Friends</div>
+  </div>
+  <div class="nav-item" id="nav-settings" onclick="navTo('settings')">
+    <div class="ni-icon">⚙️</div><div class="ni-lbl">Settings</div>
+  </div>
+</div>
+
+<button class="fab" id="fab" onclick="showModal('newGroup')">＋</button>
+
+<!-- ══════════════ MODALS ══════════════ -->
+
+<!-- NEW GROUP -->
+<div class="modal-overlay" id="modal-newGroup" onclick="closeOutside(event,'newGroup')">
+  <div class="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Create Group</div>
+    <div class="form-group">
+      <label class="f-label">Group Name</label>
+      <input class="f-input" id="ng-name" placeholder="e.g. Lahore Trip, Flat 3B...">
+    </div>
+    <div class="form-group">
+      <label class="f-label">Choose Emoji</label>
+      <div class="emoji-grid" id="emojiGrid"></div>
+    </div>
+    <div class="form-group">
+      <label class="f-label">Add Members <span style="color:var(--sub);font-weight:400">(comma separated)</span></label>
+      <input class="f-input" id="ng-members" placeholder="Ali, Sara, Ahmed, Zara">
+    </div>
+    <button class="btn-primary" onclick="createGroup()">Create Group ✓</button>
+    <button class="btn-ghost" onclick="closeModal('newGroup')">Cancel</button>
+  </div>
+</div>
+
+<!-- ADD EXPENSE -->
+<div class="modal-overlay" id="modal-addExpense" onclick="closeOutside(event,'addExpense')">
+  <div class="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Add Expense</div>
+
+    <div class="form-group">
+      <input class="f-input f-amount" id="exp-amount" type="number" placeholder="0.00" inputmode="decimal">
+    </div>
+
+    <div class="form-group">
+      <label class="f-label">Description</label>
+      <input class="f-input" id="exp-desc" placeholder="What was this for?">
+    </div>
+
+    <div class="form-group">
+      <label class="f-label">Category</label>
+      <div class="emoji-grid" id="expCatGrid" style="grid-template-columns:repeat(8,1fr)"></div>
+    </div>
+
+    <div class="form-group">
+      <label class="f-label">Date</label>
+      <input class="f-input" id="exp-date" type="date">
+    </div>
+
+    <div class="form-group">
+      <label class="f-label">Receipt Photo <span style="color:var(--sub);font-weight:400">(optional)</span></label>
+      <div class="receipt-zone" id="receiptZone">
+        <input type="file" accept="image/*" capture="environment" onchange="handleReceipt(this)">
+        <span style="font-size:1.5rem">📸</span>
+        <div style="font-size:13px;color:var(--sub);margin-top:4px">Tap to add receipt photo</div>
+        <img class="receipt-preview" id="receiptPreview">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="f-label">Paid By</label>
+      <div class="payer-list" id="payerList"></div>
+    </div>
+
+    <div class="form-group">
+      <label class="f-label">Split Type</label>
+      <div class="split-tabs">
+        <button class="st-tab active" onclick="setSplit('equal',this)">⚖️ Equal</button>
+        <button class="st-tab" onclick="setSplit('percent',this)">% Percent</button>
+        <button class="st-tab" onclick="setSplit('exact',this)">Rs Exact</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="f-label">Split Between</label>
+      <div class="member-chips" id="splitBetween"></div>
+    </div>
+
+    <div id="customInputs"></div>
+
+    <button class="btn-primary" onclick="addExpense()">Add Expense ✓</button>
+    <button class="btn-ghost" onclick="closeModal('addExpense')">Cancel</button>
+  </div>
+</div>
+
+<!-- EXPENSE DETAIL -->
+<div class="modal-overlay" id="modal-expDetail" onclick="closeOutside(event,'expDetail')">
+  <div class="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div id="expDetailContent"></div>
+    <button class="btn-ghost" onclick="closeModal('expDetail')">Close</button>
+  </div>
+</div>
+
+<!-- GROUP SETTINGS -->
+<div class="modal-overlay" id="modal-groupSettings" onclick="closeOutside(event,'groupSettings')">
+  <div class="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Group Settings</div>
+    <div class="form-group">
+      <label class="f-label">Group Name</label>
+      <input class="f-input" id="gs-name" placeholder="Group name">
+    </div>
+    <div class="form-group">
+      <label class="f-label">Add New Member</label>
+      <input class="f-input" id="gs-member" placeholder="Member name">
+    </div>
+    <button class="btn-primary" onclick="saveGroupSettings()">Save Changes</button>
+    <button class="btn-danger" onclick="deleteGroup()">Delete Group</button>
+    <button class="btn-ghost" onclick="closeModal('groupSettings')">Cancel</button>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div class="modal-overlay" id="modal-notif" onclick="closeOutside(event,'notif')">
+  <div class="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Notifications</div>
+    <div id="notifList"></div>
+    <button class="btn-ghost" onclick="closeModal('notif');clearNotifs()">Close & Clear</button>
+  </div>
+</div>
+
+<input type="file" id="importInput" accept=".json" style="display:none" onchange="handleImport(this)">
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let S = {
+  groups:    [],
+  activity:  [],
+  notifs:    [],
+  currency:  'Rs',
+  userName:  'You',
+  receipts:  {}
+};
+
+let curGroupId   = null;
+let selEmoji     = '🍕';
+let selExpCat    = '🍽️';
+let splitMode    = 'equal';
+let selPayer     = null;
+let selSplitMems = [];
+let receiptData  = null;
+let deferredPrompt = null;
+
+const COLORS = ['#c8f135','#4f8aff','#ff5f5f','#3dd68c','#ffb444','#a78bfa','#f472b6','#38bdf8','#fb923c','#a3e635'];
+const G_EMOJIS = ['🍕','🏖️','🏠','✈️','🎉','🍺','🛒','🎮','🏕️','🚗','💼','🎵','🍜','🏋️','🎲','🍰','🐾','🌴','🎓','💊','🛵','🧹','🎭','🏄'];
+const EXP_CATS = ['🍽️','🚗','🏨','🎬','🛒','💊','⚡','📦','🎮','✈️','☕','🍺','🎁','🏥','📚','🔧'];
+
+// ═══════════════════════════════════════════════════
+//  PERSISTENCE
+// ═══════════════════════════════════════════════════
+function save() {
+  try { localStorage.setItem('bsp_v2', JSON.stringify(S)); } catch(e){}
+}
+function load() {
+  try {
+    const d = localStorage.getItem('bsp_v2');
+    if (d) S = { ...S, ...JSON.parse(d) };
+  } catch(e){}
+}
+load();
+
+// ═══════════════════════════════════════════════════
+//  PWA
+// ═══════════════════════════════════════════════════
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!localStorage.getItem('bsp_install_dismissed')) {
+    document.getElementById('installBanner').classList.add('show');
+  }
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(r => {
+      if (r.outcome === 'accepted') toast('✓ App installed!');
+      document.getElementById('installBanner').classList.remove('show');
+      deferredPrompt = null;
+    });
+  }
+}
+function dismissInstall() {
+  document.getElementById('installBanner').classList.remove('show');
+  localStorage.setItem('bsp_install_dismissed', '1');
+}
+
+// SERVICE WORKER
+if ('serviceWorker' in navigator) {
+  const sw = `
+    const CACHE = 'bsp-v2';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/'])));
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => new Response('Offline'))));
+    });
+  `;
+  const blob = new Blob([sw], {type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+}
+
+// ═══════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════
+function navTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  const ni = document.getElementById('nav-' + page);
+  if (ni) ni.classList.add('active');
+  document.getElementById('fab').style.display = page === 'home' ? 'flex' : 'none';
+  if (page === 'home')     renderHome();
+  if (page === 'activity') renderActivity();
+  if (page === 'friends')  renderFriends();
+  if (page === 'settings') renderSettings();
+}
+
+// ═══════════════════════════════════════════════════
+//  MODALS
+// ═══════════════════════════════════════════════════
+function showModal(id) {
+  document.getElementById('modal-' + id).classList.add('open');
+  if (id === 'newGroup')   buildEmojiGrid('emojiGrid', false);
+  if (id === 'notif')      renderNotifs();
+}
+function closeModal(id) {
+  document.getElementById('modal-' + id).classList.remove('open');
+}
+function closeOutside(e, id) {
+  if (e.target === document.getElementById('modal-' + id)) closeModal(id);
+}
+
+// ═══════════════════════════════════════════════════
+//  EMOJI GRIDS
+// ═══════════════════════════════════════════════════
+function buildEmojiGrid(id, isExp) {
+  const arr = isExp ? EXP_CATS : G_EMOJIS;
+  const cur = isExp ? selExpCat : selEmoji;
+  const el  = document.getElementById(id);
+  el.innerHTML = '';
+  arr.forEach(em => {
+    const b = document.createElement('button');
+    b.className = 'ep-btn' + (em === cur ? ' sel' : '');
+    b.textContent = em;
+    b.onclick = () => {
+      el.querySelectorAll('.ep-btn').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+      if (isExp) selExpCat = em; else selEmoji = em;
+    };
+    el.appendChild(b);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  CREATE GROUP
+// ═══════════════════════════════════════════════════
+function createGroup() {
+  const name = document.getElementById('ng-name').value.trim();
+  if (!name) { toast('Enter a group name', true); return; }
+
+  const raw = document.getElementById('ng-members').value.trim();
+  let mems  = raw ? raw.split(',').map(m => m.trim()).filter(Boolean) : [];
+  if (!mems.includes(S.userName)) mems.unshift(S.userName);
+
+  const g = {
+    id:       Date.now(),
+    name,
+    emoji:    selEmoji,
+    members:  mems.map((n,i) => ({ id: i+1, name: n, color: COLORS[i % COLORS.length] })),
+    expenses: [],
+    settled:  [],
+    created:  new Date().toISOString()
+  };
+
+  S.groups.unshift(g);
+  addNotif(`Group <b>${name}</b> created with ${g.members.length} members`);
+  save();
+  closeModal('newGroup');
+  document.getElementById('ng-name').value = '';
+  document.getElementById('ng-members').value = '';
+  toast('✓ ' + name + ' created!');
+  openGroup(g.id);
+}
+
+// ═══════════════════════════════════════════════════
+//  OPEN GROUP
+// ═══════════════════════════════════════════════════
+function openGroup(id) {
+  curGroupId = id;
+  const g = getGroup();
+  if (!g) return;
+  document.getElementById('gd-emoji').textContent = g.emoji;
+  document.getElementById('gd-name').textContent  = g.name;
+  document.getElementById('gd-meta').textContent  = `${g.members.length} members · ${g.expenses.length} expenses`;
+  renderBalances(g);
+  renderExpenses(g);
+  renderSettlements(g);
+  document.getElementById('page-home').classList.remove('active');
+  document.getElementById('page-group').classList.add('active');
+  document.getElementById('fab').style.display = 'none';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+}
+
+function getGroup() { return S.groups.find(g => g.id === curGroupId); }
+
+// ═══════════════════════════════════════════════════
+//  BALANCE CALCULATION — precise
+// ═══════════════════════════════════════════════════
+function calcBalances(g) {
+  const bal = {};
+  g.members.forEach(m => bal[m.name] = 0);
+  g.expenses.forEach(exp => {
+    Object.entries(exp.splits).forEach(([mem, share]) => {
+      if (mem !== exp.payer) {
+        bal[exp.payer] = (bal[exp.payer] || 0) + share;
+        bal[mem]       = (bal[mem]       || 0) - share;
+      }
+    });
+  });
+  // Apply manual settlements
+  (g.settled || []).forEach(s => {
+    bal[s.from] = (bal[s.from] || 0) + s.amount;
+    bal[s.to]   = (bal[s.to]   || 0) - s.amount;
+  });
+  return bal;
+}
+
+function renderBalances(g) {
+  const bal = calcBalances(g);
+  const row = document.getElementById('balanceRow');
+  row.innerHTML = '';
+  g.members.forEach(m => {
+    const b = bal[m.name] || 0;
+    const chip = document.createElement('div');
+    chip.className = 'balance-chip';
+    chip.innerHTML = `
+      <div class="bc-avatar" style="background:${m.color}22;color:${m.color}">${m.name[0].toUpperCase()}</div>
+      <div class="bc-name">${m.name}</div>
+      <div class="bc-amt ${b > 0.5 ? 'pos' : b < -0.5 ? 'neg' : 'zero'}">
+        ${b > 0.5 ? '+' : ''}${S.currency} ${Math.abs(b).toFixed(0)}
+      </div>
+    `;
+    row.appendChild(chip);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  MIN CASH FLOW SETTLEMENTS
+// ═══════════════════════════════════════════════════
+function minCashFlow(bal) {
+  const pos = [], neg = [];
+  Object.entries(bal).forEach(([n, a]) => {
+    if (a >  0.5) pos.push({n, a});
+    if (a < -0.5) neg.push({n, a: -a});
+  });
+  pos.sort((a,b) => b.a - a.a);
+  neg.sort((a,b) => b.a - a.a);
+  const txns = [];
+  let pi = 0, ni = 0;
+  while (pi < pos.length && ni < neg.length) {
+    const amt = Math.min(pos[pi].a, neg[ni].a);
+    txns.push({ from: neg[ni].n, to: pos[pi].n, amount: amt });
+    pos[pi].a -= amt; neg[ni].a -= amt;
+    if (pos[pi].a < 0.5) pi++;
+    if (neg[ni].a < 0.5) ni++;
+  }
+  return txns;
+}
+
+function renderSettlements(g) {
+  const bal    = calcBalances(g);
+  const txns   = minCashFlow(bal);
+  const card   = document.getElementById('settleCard');
+  if (!txns.length) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  card.innerHTML = `
+    <div class="settle-card">
+      <div class="settle-title">
+        <span>✓ How to settle up</span>
+        <span style="color:var(--sub);font-size:10px">${txns.length} transaction${txns.length>1?'s':''}</span>
+      </div>
+      ${txns.map(t => `
+        <div class="settle-row">
+          <span class="settle-from">${t.from}</span>
+          <span class="settle-arrow">→</span>
+          <span class="settle-amt">${S.currency} ${t.amount.toFixed(0)}</span>
+          <span class="settle-to">${t.to}</span>
+          <button class="settle-paid-btn" onclick="markSettled('${t.from}','${t.to}',${t.amount.toFixed(2)})">✓ Done</button>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+function markSettled(from, to, amount) {
+  const g = getGroup();
+  if (!g) return;
+  if (!g.settled) g.settled = [];
+  g.settled.push({ from, to, amount: +amount, date: new Date().toISOString() });
+  S.activity.unshift({
+    icon: '✅', text: `<b>${from}</b> paid <b>${S.currency} ${amount.toFixed(0)}</b> to <b>${to}</b>`,
+    amount: `${S.currency} ${amount.toFixed(0)}`, time: timeNow(), groupId: curGroupId
+  });
+  addNotif(`<b>${from}</b> settled ${S.currency} ${amount.toFixed(0)} with <b>${to}</b>`);
+  save();
+  renderBalances(g);
+  renderSettlements(g);
+  toast(`✓ Settled ${S.currency} ${amount.toFixed(0)}`);
+}
+
+// ═══════════════════════════════════════════════════
+//  ADD EXPENSE MODAL SETUP
+// ═══════════════════════════════════════════════════
+function showAddExpense() {
+  const g = getGroup();
+  if (!g) return;
+  splitMode    = 'equal';
+  selPayer     = g.members[0]?.name || S.userName;
+  selSplitMems = g.members.map(m => m.name);
+  receiptData  = null;
+
+  document.getElementById('exp-amount').value = '';
+  document.getElementById('exp-desc').value   = '';
+  document.getElementById('exp-date').value   = new Date().toISOString().split('T')[0];
+  document.getElementById('receiptPreview').style.display = 'none';
+  buildEmojiGrid('expCatGrid', true);
+
+  // Payer
+  const pl = document.getElementById('payerList');
+  pl.innerHTML = '';
+  g.members.forEach(m => {
+    const b = document.createElement('button');
+    b.className = 'payer-btn' + (m.name === selPayer ? ' active' : '');
+    b.textContent = m.name;
+    b.onclick = () => {
+      pl.querySelectorAll('.payer-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      selPayer = m.name;
+    };
+    pl.appendChild(b);
+  });
+
+  buildSplitChips(g);
+  document.getElementById('customInputs').innerHTML = '';
+  document.querySelectorAll('.st-tab').forEach((t,i) => t.classList.toggle('active', i===0));
+  showModal('addExpense');
+}
+
+function buildSplitChips(g) {
+  const con = document.getElementById('splitBetween');
+  con.innerHTML = '';
+  g.members.forEach(m => {
+    const c = document.createElement('div');
+    c.className = 'mc' + (selSplitMems.includes(m.name) ? ' sel' : '');
+    c.innerHTML = `<div class="mc-av" style="background:${m.color}22;color:${m.color}">${m.name[0]}</div>${m.name}`;
+    c.onclick = () => {
+      if (selSplitMems.includes(m.name)) {
+        if (selSplitMems.length === 1) return;
+        selSplitMems = selSplitMems.filter(x => x !== m.name);
+      } else {
+        selSplitMems.push(m.name);
+      }
+      c.classList.toggle('sel', selSplitMems.includes(m.name));
+      rebuildCustom(g);
+    };
+    con.appendChild(c);
+  });
+}
+
+function setSplit(mode, btn) {
+  splitMode = mode;
+  document.querySelectorAll('.st-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  rebuildCustom(getGroup());
+}
+
+function rebuildCustom(g) {
+  const con = document.getElementById('customInputs');
+  if (splitMode === 'equal') { con.innerHTML = ''; return; }
+  const amt = parseFloat(document.getElementById('exp-amount').value) || 0;
+  const sym = splitMode === 'percent' ? '%' : S.currency;
+  const def = splitMode === 'percent'
+    ? (100 / selSplitMems.length).toFixed(1)
+    : (amt  / selSplitMems.length).toFixed(0);
+  con.innerHTML = `<div class="form-group"><label class="f-label">Custom Amounts (${sym})</label>` +
+    selSplitMems.map(n => `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="flex:1;font-size:14px;font-weight:600">${n}</span>
+        <input class="f-input" id="ci-${n.replace(/\s/g,'_')}" type="number" value="${def}" style="width:110px;text-align:right" inputmode="decimal">
+        <span style="color:var(--sub);font-size:12px;width:24px">${sym}</span>
+      </div>`).join('') + '</div>';
+}
+
+// ═══════════════════════════════════════════════════
+//  RECEIPT PHOTO
+// ═══════════════════════════════════════════════════
+function handleReceipt(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    receiptData = e.target.result;
+    const prev  = document.getElementById('receiptPreview');
+    prev.src     = receiptData;
+    prev.style.display = 'block';
+    toast('📸 Receipt added');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ═══════════════════════════════════════════════════
+//  ADD EXPENSE — core
+// ═══════════════════════════════════════════════════
+function addExpense() {
+  const amount = parseFloat(document.getElementById('exp-amount').value);
+  const desc   = document.getElementById('exp-desc').value.trim() || 'Expense';
+  const date   = document.getElementById('exp-date').value || new Date().toISOString().split('T')[0];
+  const g      = getGroup();
+  if (!amount || amount <= 0) { toast('Enter a valid amount', true); return; }
+  if (!selPayer)              { toast('Select who paid', true); return; }
+
+  // Build splits
+  const splits = {};
+  if (splitMode === 'equal') {
+    const sh = +(amount / selSplitMems.length).toFixed(2);
+    // Handle rounding penny
+    let total = 0;
+    selSplitMems.forEach((m, i) => {
+      splits[m] = (i === selSplitMems.length - 1) ? +(amount - total).toFixed(2) : sh;
+      total += sh;
+    });
+  } else if (splitMode === 'percent') {
+    let totalPct = 0;
+    selSplitMems.forEach(m => {
+      const pct = parseFloat(document.getElementById('ci-' + m.replace(/\s/g,'_'))?.value) || 0;
+      splits[m]  = +(amount * pct / 100).toFixed(2);
+      totalPct  += pct;
+    });
+    if (Math.abs(totalPct - 100) > 1) { toast('Percentages must total 100%', true); return; }
+  } else {
+    let total = 0;
+    selSplitMems.forEach(m => {
+      const v  = parseFloat(document.getElementById('ci-' + m.replace(/\s/g,'_'))?.value) || 0;
+      splits[m] = +v.toFixed(2); total += v;
+    });
+    if (Math.abs(total - amount) > 1) { toast(`Splits must total ${S.currency} ${amount}`, true); return; }
+  }
+
+  const exp = {
+    id:      Date.now(),
+    desc, amount, payer: selPayer, splits,
+    cat:     selExpCat, date,
+    receipt: receiptData,
+    groupId: curGroupId
+  };
+
+  g.expenses.unshift(exp);
+
+  if (receiptData) S.receipts[exp.id] = receiptData;
+
+  S.activity.unshift({
+    icon: selExpCat,
+    text: `<b>${selPayer}</b> paid <b>${S.currency} ${amount.toFixed(0)}</b> for "${desc}"`,
+    amount: `${S.currency} ${amount.toFixed(0)}`,
+    time: timeNow(), groupId: curGroupId
+  });
+
+  addNotif(`New expense: <b>${desc}</b> — ${S.currency} ${amount.toFixed(0)}`);
+  save();
+  closeModal('addExpense');
+  renderExpenses(g);
+  renderBalances(g);
+  renderSettlements(g);
+  document.getElementById('gd-meta').textContent = `${g.members.length} members · ${g.expenses.length} expenses`;
+  toast(`✓ ${S.currency} ${amount.toFixed(0)} added`);
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER EXPENSES
+// ═══════════════════════════════════════════════════
+function renderExpenses(g) {
+  const list = document.getElementById('expensesList');
+  if (!g.expenses.length) {
+    list.innerHTML = `<div class="empty-state"><span class="es-icon">💸</span><div class="es-title">No expenses yet</div><div class="es-sub">Tap + Add to record your first expense</div></div>`;
+    return;
+  }
+  list.innerHTML = g.expenses.map(exp => {
+    const myShare = exp.splits[S.userName] || 0;
+    const isMyPay = exp.payer === S.userName;
+    return `<div class="expense-item" onclick="showExpDetail(${exp.id})">
+      <div class="ei-icon">${exp.cat || '💸'}</div>
+      <div class="ei-info">
+        <div class="ei-name">${exp.desc}</div>
+        <div class="ei-by">Paid by ${exp.payer} · ${fmtDate(exp.date)}</div>
+      </div>
+      <div class="ei-right">
+        <div class="ei-amount">${S.currency} ${exp.amount.toFixed(0)}</div>
+        <div class="ei-share" style="color:${isMyPay?'var(--green)':'var(--sub)'}">
+          ${isMyPay ? 'you paid' : 'your share: ' + S.currency + ' ' + myShare.toFixed(0)}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// EXPENSE DETAIL
+function showExpDetail(id) {
+  const g   = getGroup();
+  const exp = g?.expenses.find(e => e.id === id);
+  if (!exp) return;
+
+  const content = document.getElementById('expDetailContent');
+  content.innerHTML = `
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="font-size:2.5rem;margin-bottom:8px">${exp.cat}</div>
+      <div style="font-family:var(--font);font-size:22px;font-weight:900">${exp.desc}</div>
+      <div style="font-family:var(--font);font-size:32px;font-weight:900;color:var(--lime);margin:8px 0">${S.currency} ${exp.amount.toFixed(0)}</div>
+      <div style="font-size:12px;color:var(--sub)">Paid by ${exp.payer} · ${fmtDate(exp.date)}</div>
+    </div>
+    ${exp.receipt ? `<img src="${exp.receipt}" style="width:100%;border-radius:12px;margin-bottom:14px;max-height:180px;object-fit:cover">` : ''}
+    <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Split Details</div>
+    ${Object.entries(exp.splits).map(([mem, share]) => {
+      const isPayer = mem === exp.payer;
+      return `<div class="split-detail-row">
+        <div class="sdr-av" style="background:${getMemberColor(g,mem)}22;color:${getMemberColor(g,mem)}">${mem[0]}</div>
+        <div class="sdr-name">${mem}${isPayer?' (paid)':''}</div>
+        <div class="sdr-amount">${S.currency} ${share.toFixed(0)}</div>
+        <span class="sdr-status ${isPayer?'paid':'owes'}">${isPayer?'Paid':'Owes'}</span>
+      </div>`;
+    }).join('')}
+    <button class="btn-danger" style="margin-top:16px" onclick="deleteExpense(${id})">Delete Expense</button>
+  `;
+  showModal('expDetail');
+}
+
+function deleteExpense(id) {
+  const g = getGroup();
+  g.expenses = g.expenses.filter(e => e.id !== id);
+  save();
+  closeModal('expDetail');
+  renderExpenses(g);
+  renderBalances(g);
+  renderSettlements(g);
+  document.getElementById('gd-meta').textContent = `${g.members.length} members · ${g.expenses.length} expenses`;
+  toast('Expense deleted');
+}
+
+function getMemberColor(g, name) {
+  return g.members.find(m => m.name === name)?.color || '#888';
+}
+
+// ═══════════════════════════════════════════════════
+//  HOME RENDER
+// ═══════════════════════════════════════════════════
+function renderHome() {
+  const list = document.getElementById('groupsList');
+  if (!S.groups.length) {
+    list.innerHTML = `<div class="empty-state"><span class="es-icon">🤝</span><div class="es-title">No groups yet</div><div class="es-sub">Create a group to start splitting bills with friends</div></div>`;
+    updateSummary(); updateQuickStats(); return;
+  }
+  list.innerHTML = S.groups.map(g => {
+    const bal  = calcBalances(g);
+    const my   = bal[S.userName] || 0;
+    const tot  = g.expenses.reduce((s,e) => s+e.amount, 0);
+    const cls  = my > 0.5 ? 'owed' : my < -0.5 ? 'owe' : 'zero';
+    const lbl  = my > 0.5 ? 'owed to you' : my < -0.5 ? 'you owe' : 'settled';
+    return `<div class="group-card" onclick="openGroup(${g.id})">
+      <div class="gc-emoji">${g.emoji}</div>
+      <div class="gc-info">
+        <div class="gc-name">${g.name}</div>
+        <div class="gc-meta">${g.members.length} members · ${S.currency} ${tot.toFixed(0)} total</div>
+      </div>
+      <div class="gc-right">
+        <div class="gc-amount ${cls}">${S.currency} ${Math.abs(my).toFixed(0)}</div>
+        <div class="gc-label">${lbl}</div>
+      </div>
+    </div>`;
+  }).join('');
+  updateSummary();
+  updateQuickStats();
+}
+
+function filterGroups(q) {
+  document.querySelectorAll('.group-card').forEach(c => {
+    const name = c.querySelector('.gc-name')?.textContent.toLowerCase() || '';
+    c.style.display = name.includes(q.toLowerCase()) ? 'flex' : 'none';
+  });
+}
+
+function updateSummary() {
+  let owe = 0, owed = 0;
+  S.groups.forEach(g => {
+    const b = (calcBalances(g)[S.userName] || 0);
+    if (b < -0.5) owe  += Math.abs(b);
+    if (b >  0.5) owed += b;
+  });
+  document.getElementById('s-owe').textContent  = `${S.currency} ${owe.toFixed(0)}`;
+  document.getElementById('s-owed').textContent = `${S.currency} ${owed.toFixed(0)}`;
+}
+
+function updateQuickStats() {
+  const totalExp = S.groups.reduce((s,g) => s + g.expenses.length, 0);
+  const settled  = S.groups.filter(g => {
+    const b = calcBalances(g);
+    return Object.values(b).every(v => Math.abs(v) < 0.5);
+  }).length;
+  document.getElementById('qs-groups').textContent  = S.groups.length;
+  document.getElementById('qs-exp').textContent     = totalExp;
+  document.getElementById('qs-settled').textContent = settled;
+}
+
+// ═══════════════════════════════════════════════════
+//  ACTIVITY
+// ═══════════════════════════════════════════════════
+function renderActivity() {
+  const list = document.getElementById('activityList');
+  if (!S.activity.length) {
+    list.innerHTML = `<div class="empty-state"><span class="es-icon">📋</span><div class="es-title">No activity yet</div><div class="es-sub">Add expenses to see history here</div></div>`;
+    return;
+  }
+  list.innerHTML = S.activity.slice(0,60).map(a =>
+    `<div class="activity-item">
+      <div class="ai-icon">${a.icon || '💸'}</div>
+      <div class="ai-body">
+        <div class="ai-text">${a.text}</div>
+        <div class="ai-meta">${a.time}</div>
+      </div>
+      <div class="ai-amount">${a.amount || ''}</div>
+    </div>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════
+//  FRIENDS
+// ═══════════════════════════════════════════════════
+function renderFriends() {
+  const all = {};
+  S.groups.forEach(g => {
+    const bal = calcBalances(g);
+    g.members.forEach(m => {
+      if (m.name === S.userName) return;
+      if (!all[m.name]) all[m.name] = { name: m.name, color: m.color, total: 0, groups: 0 };
+      all[m.name].total  += (bal[m.name] || 0);
+      all[m.name].groups += 1;
+    });
+  });
+
+  const list = document.getElementById('friendsList');
+  const arr  = Object.values(all);
+  if (!arr.length) {
+    list.innerHTML = `<div class="empty-state"><span class="es-icon">👥</span><div class="es-title">No friends yet</div><div class="es-sub">Add members to your groups to see them here</div></div>`;
+    return;
+  }
+  list.innerHTML = arr.map(f => {
+    const b   = f.total;
+    const cls = b > 0.5 ? 'owed' : b < -0.5 ? 'owe' : 'zero';
+    const lbl = b > 0.5 ? 'owes you' : b < -0.5 ? 'you owe' : 'settled';
+    return `<div class="group-card">
+      <div class="gc-emoji" style="background:${f.color}22;font-size:1.4rem;color:${f.color}">
+        ${f.name[0].toUpperCase()}
+      </div>
+      <div class="gc-info">
+        <div class="gc-name">${f.name}</div>
+        <div class="gc-meta">${f.groups} shared group${f.groups>1?'s':''}</div>
+      </div>
+      <div class="gc-right">
+        <div class="gc-amount ${cls}">${S.currency} ${Math.abs(b).toFixed(0)}</div>
+        <div class="gc-label">${lbl}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+//  NOTIFICATIONS
+// ═══════════════════════════════════════════════════
+function addNotif(text) {
+  S.notifs.unshift({ text, time: timeNow(), read: false });
+  if (S.notifs.length > 20) S.notifs.pop();
+  const unread = S.notifs.filter(n => !n.read).length;
+  document.getElementById('notifBtn').classList.toggle('has-notif', unread > 0);
+  document.getElementById('nb-activity').textContent = S.activity.length;
+  save();
+}
+function renderNotifs() {
+  const list = document.getElementById('notifList');
+  if (!S.notifs.length) {
+    list.innerHTML = `<div class="empty-state"><span class="es-icon">🔔</span><div class="es-title">No notifications</div></div>`;
+    return;
+  }
+  list.innerHTML = S.notifs.map(n =>
+    `<div class="activity-item">
+      <div class="ai-icon">🔔</div>
+      <div class="ai-body"><div class="ai-text">${n.text}</div><div class="ai-meta">${n.time}</div></div>
+    </div>`
+  ).join('');
+  S.notifs.forEach(n => n.read = true);
+  document.getElementById('notifBtn').classList.remove('has-notif');
+}
+function clearNotifs() {
+  S.notifs = []; save();
+  document.getElementById('notifBtn').classList.remove('has-notif');
+}
+
+// ═══════════════════════════════════════════════════
+//  GROUP SETTINGS
+// ═══════════════════════════════════════════════════
+function showGroupSettings() {
+  const g = getGroup();
+  if (!g) return;
+  document.getElementById('gs-name').value   = g.name;
+  document.getElementById('gs-member').value = '';
+  showModal('groupSettings');
+}
+
+function saveGroupSettings() {
+  const g = getGroup();
+  if (!g) return;
+  const newName = document.getElementById('gs-name').value.trim();
+  const newMem  = document.getElementById('gs-member').value.trim();
+  if (newName) g.name = newName;
+  if (newMem && !g.members.find(m => m.name === newMem)) {
+    g.members.push({ id: Date.now(), name: newMem, color: COLORS[g.members.length % COLORS.length] });
+    toast('✓ ' + newMem + ' added');
+  }
+  save();
+  closeModal('groupSettings');
+  document.getElementById('gd-name').textContent = g.name;
+  document.getElementById('gd-meta').textContent = `${g.members.length} members · ${g.expenses.length} expenses`;
+  renderBalances(g);
+}
+
+function deleteGroup() {
+  if (!confirm('Delete this group and all its expenses?')) return;
+  S.groups = S.groups.filter(g => g.id !== curGroupId);
+  save();
+  closeModal('groupSettings');
+  navTo('home');
+  toast('Group deleted');
+}
+
+// ═══════════════════════════════════════════════════
+//  WHATSAPP SHARE
+// ═══════════════════════════════════════════════════
+function shareGroup() {
+  const g    = getGroup();
+  if (!g) return;
+  const bal  = calcBalances(g);
+  const txns = minCashFlow(bal);
+  const tot  = g.expenses.reduce((s,e) => s+e.amount, 0);
+
+  let msg = `💰 *BillSplit Pro — ${g.name}*\n\n`;
+  msg += `Total: ${S.currency} ${tot.toFixed(0)}\n`;
+  msg += `Members: ${g.members.map(m=>m.name).join(', ')}\n\n`;
+  if (txns.length) {
+    msg += `*Settlements:*\n`;
+    txns.forEach(t => msg += `• ${t.from} → ${t.to}: ${S.currency} ${t.amount.toFixed(0)}\n`);
+  } else {
+    msg += `✅ Everyone is settled up!\n`;
+  }
+  msg += `\n_Tracked with BillSplit Pro — Free App_`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+// ═══════════════════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════════════════
+function renderSettings() {
+  document.getElementById('userName').value  = S.userName;
+  document.getElementById('profileAvatar').textContent = S.userName[0]?.toUpperCase() || 'Y';
+  document.querySelectorAll('.curr-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.c === S.currency);
+  });
+}
+
+function saveName(val) {
+  S.userName = val || 'You';
+  document.getElementById('profileAvatar').textContent = S.userName[0]?.toUpperCase() || 'Y';
+  save();
+}
+
+function setCurrency(btn) {
+  document.querySelectorAll('.curr-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  S.currency = btn.dataset.c;
+  save();
+  toast('Currency: ' + S.currency);
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(S, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `billsplit_backup_${Date.now()}.json`; a.click();
+  URL.revokeObjectURL(url);
+  toast('✓ Backup exported');
+}
+
+function importData() { document.getElementById('importInput').click(); }
+
+function handleImport(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (d.groups) { S = { ...S, ...d }; save(); navTo('home'); toast('✓ Data imported'); }
+      else toast('Invalid backup file', true);
+    } catch(err) { toast('Import failed', true); }
+  };
+  r.readAsText(file);
+  input.value = '';
+}
+
+function clearData() {
+  if (!confirm('Delete ALL data? Cannot be undone!')) return;
+  S.groups = []; S.activity = []; S.notifs = [];
+  save(); navTo('home'); toast('All data cleared');
+}
+
+// ═══════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════
+function fmtDate(str) {
+  if (!str) return '';
+  const d = new Date(str);
+  return d.toLocaleDateString('en', { month:'short', day:'numeric' });
+}
+function timeNow() {
+  return new Date().toLocaleString('en', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+let toastT;
+function toast(msg, err=false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (err?' err':'');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// INIT
+renderHome();
+
+// Update nav badge
+const actBadge = document.getElementById('nb-activity');
+if (S.activity.length) { actBadge.textContent = S.activity.length; actBadge.classList.add('show'); }
+</script>
 </body>
 </html>
