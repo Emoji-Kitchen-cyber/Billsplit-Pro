@@ -8,6 +8,14 @@
   "background_color": "#0f0f14",
   "theme_color": "#0f0f14",
   "orientation": "portrait",
+  "categories": [
+    "finance",
+    "utilities",
+    "productivity"
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "iarc_rating_id": "",
   "icons": [
     {
       "src": "/dp/icon-192x192.png",
