@@ -4,7 +4,15 @@
   "short_name": "BillSplit Pro",
   "description": "Split bills fairly with friends. Zero drama, instant settlements.",
   "start_url": "/",
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "window-controls-overlay",
+    "minimal-ui"
+  ],
   "background_color": "#0f0f14",
   "theme_color": "#0f0f14",
   "orientation": "portrait",
@@ -16,23 +24,18 @@
   "prefer_related_applications": false,
   "related_applications": [],
   "iarc_rating_id": "",
-  "serviceworker": {
-    "src": "/sw.js",
-    "scope": "/",
-    "use_cache": true
-  },
   "icons": [
     {
       "src": "/dp/icon-192x192.png",
       "sizes": "1024x1024",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/dp/icon-512x512.png",
       "sizes": "1024x1024",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ],
   "screenshots": [
@@ -41,14 +44,28 @@
       "sizes": "1024x1024",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "BillSplit Pro Home"
+      "label": "BillSplit Pro Desktop Layout"
     },
     {
       "src": "/dp/icon-192x192.png",
       "sizes": "1024x1024",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "BillSplit Pro Mobile"
+      "label": "BillSplit Pro Mobile Layout"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Split",
+      "short_name": "Split",
+      "description": "Start a new bill split instantly",
+      "url": "/?shortcut=new-split",
+      "icons": [
+        {
+          "src": "/dp/icon-192x192.png",
+          "sizes": "1024x1024"
+        }
+      ]
     }
   ]
 }
