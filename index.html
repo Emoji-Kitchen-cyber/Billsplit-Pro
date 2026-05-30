@@ -854,5 +854,20 @@ body::before {
 <div class="toast" id="toast"></div>
 
 <script src="./app.js"></script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => {
+          console.log('Service Worker successfully registered with scope:', reg.scope);
+        })
+        .catch(err => {
+          console.error('Service Worker registration failed:', err);
+        });
+    });
+  }
+</script>
+
 </body>
 </html>
