@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f0f14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Split bills fairly with friends. Zero drama, instant settlements.">
+
+  <title>BillSplit Pro — Fair Split, Zero Drama</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@400;600;700;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- INSTALL BANNER -->
+  <div class="install-banner" id="installBanner">
+    <div class="ib-text"><b>Install BillSplit Pro</b><br>Add to home screen for best experience</div>
+    <button class="ib-btn" onclick="installApp()">Install</button>
+    <button class="ib-close" onclick="dismissInstall()">×</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">Bill<span>Split</span></div>
+    <div class="header-right">
+      <div class="icon-btn notif-dot" id="notifBtn" onclick="showModal('notif')">🔔</div>
+      <div class="icon-btn" onclick="navTo('settings')">⚙️</div>
+    </div>
+  </div>
+
+  <!-- Pages -->
+  <div class="page active" id="page-home"> ... (Full content same as your original) ... </div>
+  <div class="page" id="page-group"> ... </div>
+  <div class="page" id="page-activity"> ... </div>
+  <div class="page" id="page-friends"> ... </div>
+  <div class="page" id="page-settings"> ... </div>
+
+  <!-- Bottom Nav + FAB + All Modals -->
+  <!-- Copy all remaining HTML from your original code (everything between <body> and </body> except <style> and <script>) -->
+
+  <script src="js/app.js" defer></script>
+</body>
+</html>
