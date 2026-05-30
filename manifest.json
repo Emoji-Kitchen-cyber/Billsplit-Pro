@@ -1,75 +1,31 @@
 {
-  "id": "/",
   "name": "BillSplit Pro",
-  "short_name": "BillSplit Pro",
+  "short_name": "BillSplit",
   "description": "Split bills fairly with friends. Zero drama, instant settlements.",
   "start_url": "/",
   "scope": "/",
-  "lang": "en",
-  "dir": "ltr",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "minimal-ui"
-  ],
   "background_color": "#0f0f14",
-  "theme_color": "#0f0f14",
+  "theme_color": "#c8f135",
   "orientation": "portrait",
-  "categories": [
-    "finance",
-    "utilities",
-    "productivity"
-  ],
-  "prefer_related_applications": false,
-  "iarc_rating_id": "",
+  "categories": ["finance", "utilities"],
   "icons": [
     {
-      "src": "/icon-192x192.png",
+      "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
-      "src": "/icon-512x512.png",
+      "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
-      "src": "/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshot-wide.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "BillSplit Pro Desktop View"
-    },
-    {
-      "src": "/screenshot-narrow.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "BillSplit Pro Mobile View"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "New Split",
-      "short_name": "Split",
-      "description": "Start a new bill split instantly",
-      "url": "/?shortcut=new-split",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
     }
   ]
 }
