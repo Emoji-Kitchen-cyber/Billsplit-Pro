@@ -1,7 +1,7 @@
 {
   "name": "BillSplit Pro",
   "short_name": "BillSplit",
-  "description": "Split bills fairly with friends. Zero drama, instant settlements.",
+  "description": "Split bills fairly with friends. Zero drama.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0f0f14",
