@@ -1,0 +1,25 @@
+:root {
+  --bg:      #0f0f14;
+  --surface: #17171f;
+  --card:    #1e1e28;
+  --card2:   #252532;
+  --border:  rgba(255,255,255,0.07);
+  --text:    #f0f0f8;
+  --sub:     #7f7f9a;
+  --lime:    #c8f135;
+  --lime2:   #a8d420;
+  --blue:    #4f8aff;
+  --red:     #ff5f5f;
+  --amber:   #ffb444;
+  --green:   #3dd68c;
+  --purple:  #a78bfa;
+  --pink:    #f472b6;
+  --r:       16px;
+  --r2:      12px;
+  --font:    'Anybody', sans-serif;
+  --body:    'DM Sans', sans-serif;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+
+/* Paste ALL your CSS here from original <style> tag */
